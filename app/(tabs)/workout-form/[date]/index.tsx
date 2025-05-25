@@ -17,27 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Months, WeekDays } from "@/constants/WeekDays";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
-
-type DateString = string;
-
-type Set = {
-  reps: number;
-  weight: number;
-};
-
-type DropSet = Set[];
-
-type Exercise = {
-  name: string;
-  sets: DropSet[];
-};
-
-type Workout = {
-  date: DateString;
-  name: string;
-  bodyWeight: number;
-  exercises: Exercise[];
-};
+import { Exercise } from "@/types/workout";
 
 const WorkoutForm = () => {
   const colorScheme = useColorScheme() ?? "dark";
@@ -48,9 +28,7 @@ const WorkoutForm = () => {
   const { date } = useLocalSearchParams();
   const [name, setName] = useState("");
   const [weight, setWeight] = useState("");
-  const [exercises, setExercises] = useState<
-    { name: string; sets: { reps: number; weight: number }[][] }[]
-  >([]);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
 
   const addExercise = () => {
     setExercises((prev) => [
@@ -177,7 +155,7 @@ const WorkoutForm = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
       <ScrollView
         style={[styles.container, { backgroundColor: theme.background }]}
         showsVerticalScrollIndicator={false}

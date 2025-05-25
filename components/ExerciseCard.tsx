@@ -3,32 +3,37 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Text, useColorScheme, View, TouchableOpacity } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { Link } from "expo-router";
+import { Workout } from "@/types/workout";
 
 // Define types for better type safety
 interface ExerciseCardProps {
-  title?: string;
-  date?: string;
-  exercises?: string[];
-  workoutId?: string;
+  workout: Workout;
+  // title?: string;
+  // date?: string;
+  // exercises?: string[];
+  // workoutId?: string;
 }
 
 interface ExerciseChipProps {
   label: string;
 }
 
-export const ExerciseCard = ({
-  title = "🏋️ Chest Day",
-  date = "25th May 2025",
-  exercises = [
-    "Bench Press x2",
-    "Incline Dumbell Press x3",
-    "Butterfly x2",
-    "Bench Press x2",
-  ],
-  workoutId = "2025-05-25",
-}: ExerciseCardProps) => {
-  const theme = useColorScheme() ?? "dark";
-  const cardColor = Colors[theme].cardBackground;
+export const ExerciseCard = ({ workout }: ExerciseCardProps) => {
+  const colorScheme = useColorScheme() ?? "dark";
+  const oppositeColorScheme = colorScheme === "dark" ? "light" : "dark";
+
+  const theme = Colors[colorScheme];
+  const oppositeTheme = Colors[oppositeColorScheme];
+
+  const cardColor = theme.cardBackground;
+
+  const { date, name, exercises: detailedExercises } = workout;
+
+  const exercises = detailedExercises.map((ex) => {
+    return `${ex.name} x${ex.sets.length}`;
+  });
+  const title = name;
+  const workoutId = workout.date;
 
   // Calculate additional exercises count
   const displayExercises = exercises.slice(0, 4);
@@ -38,7 +43,11 @@ export const ExerciseCard = ({
     <Link href={`/workout-form/${workoutId}`} asChild>
       <TouchableOpacity activeOpacity={0.8}>
         <LinearGradient
-          colors={["rgba(255,255,255,0.09)", "rgba(0,0,0,0.01)"]}
+          colors={
+            colorScheme === "dark"
+              ? ["rgba(255,255,255,0.05)", "rgba(0,0,0,0.2)"] // Dark mode gradient
+              : ["rgba(230,230,230,0.9)", "rgba(200,200,200,0.6)"]
+          }
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={{
@@ -67,7 +76,7 @@ export const ExerciseCard = ({
           >
             <Text
               style={{
-                color: "#fff",
+                color: theme.text,
                 fontSize: 20, // Slightly smaller for better hierarchy
                 fontWeight: "600", // Added weight for emphasis
               }}
@@ -109,6 +118,12 @@ export const ExerciseCard = ({
 
 const ExerciseChip = ({ label }: ExerciseChipProps) => {
   const colorScheme = useColorScheme() ?? "dark";
+
+  const oppositeColorScheme = colorScheme === "dark" ? "light" : "dark";
+
+  const theme = Colors[colorScheme];
+  const oppositeTheme = Colors[oppositeColorScheme];
+
   const cardBg = Colors[colorScheme].cardBackground;
 
   return (
@@ -125,7 +140,7 @@ const ExerciseChip = ({ label }: ExerciseChipProps) => {
     >
       <Text
         style={{
-          color: "#fff",
+          color: theme.text,
           fontSize: 12, // Slightly smaller for chips
           fontWeight: "500", // Added weight
         }}

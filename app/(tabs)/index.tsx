@@ -1,3 +1,18 @@
+//{/* button  */}
+//<TouchableOpacity
+//  style={{
+//    flexDirection: "row",
+//    alignItems: "center",
+//    backgroundColor: tint,
+//    paddingVertical: 6,
+//    paddingHorizontal: 16,
+//    borderRadius: 12, // pill shape
+//    gap: 4, // space between icon and text
+//  }}
+//>
+//  <MaterialIcons name="copy-all" size={20} color="black" />
+//  <Text style={styles.text}>Apply today</Text>
+//</TouchableOpacity>
 import {
   StyleSheet,
   useColorScheme,
@@ -19,6 +34,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { ExerciseCard } from "@/components/ExerciseCard";
 import { WeekDays } from "@/constants/WeekDays";
+import { workouts } from "@/data/workouts";
 
 // Constants for better maintainability
 const CARD_WIDTH = 80;
@@ -63,12 +79,21 @@ export default function HomeScreen() {
     }
   }, [width]);
 
-  const theme = useColorScheme() ?? "dark";
-  const cardColor = Colors[theme].cardBackground;
-  const tint = Colors[theme].tint;
+  const colorScheme = useColorScheme() ?? "dark";
+  const oppositeColorScheme = colorScheme === "dark" ? "light" : "dark";
+
+  const theme = Colors[colorScheme];
+  const oppositeTheme = Colors[oppositeColorScheme];
+
+  const tint = Colors[colorScheme].tint;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={{
+        backgroundColor: theme.background,
+        ...styles.container,
+      }}
+    >
       <ScrollView style={styles.scrollView}>
         <View style={styles.greeting}>
           <ThemedText darkColor={"#ddd"} type="subtitle">
@@ -97,27 +122,58 @@ export default function HomeScreen() {
           accessibilityLabel="Begin your workout"
         >
           <View style={styles.workoutButtonContent}>
-            <MaterialIcons name="add" size={20} color="black" />
-            <Text style={styles.workoutButtonText}>Begin Your Workout</Text>
+            <MaterialIcons name="add" size={20} color={oppositeTheme.text} />
+            <Text
+              style={{
+                ...styles.workoutButtonText,
+                color: oppositeTheme.text,
+              }}
+            >
+              Begin Your Workout
+            </Text>
           </View>
         </Link>
 
         <View style={styles.previousWorkoutsSection}>
           <View style={styles.sectionHeader}>
-            <IconSymbol name="dumbbell" size={24} color="#fff" />
-            <Text style={styles.sectionTitle}>Previous Workouts</Text>
+            <IconSymbol name="dumbbell" size={24} color={theme.text} />
+            <Text
+              style={{
+                color: theme.text,
+                ...styles.sectionTitle,
+              }}
+            >
+              Previous Workouts
+            </Text>
           </View>
 
-          <ThemedText style={styles.sectionSubtitle}>
-            Shows the last 5 workouts you did.
-          </ThemedText>
+          {workouts.length !== 0 && (
+            <ThemedText style={styles.sectionSubtitle}>
+              Shows the last 5 workouts you did.
+            </ThemedText>
+          )}
 
           <View style={styles.exerciseCardsContainer}>
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
-            <ExerciseCard />
+            {/* <ExerciseCard /> */}
+            {/* <ExerciseCard /> */}
+            {/* <ExerciseCard /> */}
+            {/* <ExerciseCard /> */}
+            {/* <ExerciseCard /> */}
+
+            {workouts.length === 0 && (
+              <View style={styles.emptyState}>
+                <Text style={[styles.emptyStateText, { color: theme.icon }]}>
+                  No workouts added yet
+                </Text>
+                <Text style={[styles.emptyStateSubtext, { color: theme.icon }]}>
+                  Tap "Begin Your Workout" to get started
+                </Text>
+              </View>
+            )}
+
+            {workouts.map((workout) => (
+              <ExerciseCard key={workout.date} workout={workout} />
+            ))}
           </View>
         </View>
       </ScrollView>
@@ -127,6 +183,10 @@ export default function HomeScreen() {
 
 const DayCard = ({ date, isSelected = false }: DayCardProps) => {
   const colorScheme = useColorScheme() ?? "dark";
+  const oppositeColorScheme = colorScheme === "dark" ? "light" : "dark";
+
+  const theme = Colors[colorScheme];
+  const oppositeTheme = Colors[oppositeColorScheme];
 
   const { day, monthdate, bgColor, textColor, isToday, isPast } =
     useMemo(() => {
@@ -150,8 +210,13 @@ const DayCard = ({ date, isSelected = false }: DayCardProps) => {
           bgColor = Colors[colorScheme].cardBackground;
         }
 
-        const textColor =
-          bgColor === Colors[colorScheme].tint ? "#000" : "#fff";
+        // const textColor = oppositeTheme.text;
+        let textColor = "";
+        if (isToday || isPast) {
+          textColor = oppositeTheme.text;
+        } else {
+          textColor = theme.text;
+        }
 
         return {
           day: dateObj.getDay(),
@@ -199,15 +264,17 @@ const DayCard = ({ date, isSelected = false }: DayCardProps) => {
       }
     >
       <ThemedText
-        darkColor={textColor}
-        style={[styles.dayText, isToday && styles.todayText]}
+        style={[
+          styles.dayText,
+          isToday && styles.todayText,
+          { color: textColor },
+        ]}
       >
         {dayName}
       </ThemedText>
       <ThemedText
-        darkColor={textColor}
         type="title"
-        style={isToday && styles.todayText}
+        style={[isToday && styles.todayText, { color: textColor }]}
       >
         {monthdate}
       </ThemedText>
@@ -292,7 +359,7 @@ const styles = StyleSheet.create({
   workoutButtonText: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#000",
+    // color: "#000",
   },
   previousWorkoutsSection: {
     marginTop: 20,
@@ -305,7 +372,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sectionTitle: {
-    color: "#fff",
     fontSize: 28,
     fontWeight: "bold",
   },
@@ -316,229 +382,19 @@ const styles = StyleSheet.create({
     gap: 16,
     marginTop: 16,
   },
+  emptyState: {
+    alignItems: "center",
+    padding: 40,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    fontWeight: "500",
+    marginBottom: 4,
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+  },
 });
-// import {
-//   StyleSheet,
-//   useColorScheme,
-//   useWindowDimensions,
-//   View,
-//   Text,
-//   ScrollView,
-//   TouchableOpacity,
-//   Touchable,
-//   Pressable,
-// } from "react-native";
-//
-// import { HelloWave } from "@/components/HelloWave";
-// import { ThemedText } from "@/components/ThemedText";
-// import { SafeAreaView } from "react-native-safe-area-context";
-// import { useMemo, useState } from "react";
-// import { Colors } from "@/constants/Colors";
-// import { IconSymbol } from "@/components/ui/IconSymbol";
-// import { MaterialIcons } from "@expo/vector-icons";
-// import { LinearGradient } from "expo-linear-gradient";
-// import { Link } from "expo-router";
-// import { ExerciseCard } from "@/components/ExerciseCard";
-// import { WeekDays } from "@/constants/WeekDays";
-//
-// export default function HomeScreen() {
-//   const { width } = useWindowDimensions();
-//
-//   const [dates, setDates] = useState<string[]>([]);
-//
-//   useMemo(() => {
-//     const maxCards = Math.floor((width - 40) / 80); // I want today to be at center
-//
-//     const startDate = new Date();
-//     startDate.setHours(0, 0, 0, 0);
-//
-//     startDate.setDate(startDate.getDate() - maxCards / 2 + 1);
-//
-//     const dates = [];
-//
-//     for (let i = 0; i < maxCards; i++) {
-//       const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
-//       dates.push(date.toISOString());
-//     }
-//
-//     setDates(dates);
-//
-//     return () => {};
-//   }, [width]);
-//
-//   //
-//   const theme = useColorScheme() ?? "dark";
-//   const cardColor = Colors[theme].cardBackground;
-//   //
-//
-//   const tint = Colors[theme].tint;
-//
-//   return (
-//     <SafeAreaView style={{}}>
-//       <ScrollView style={{ paddingLeft: 20, paddingRight: 20, marginTop: 40 }}>
-//         <View style={{}}>
-//           <ThemedText darkColor={"#ddd"} type="subtitle">
-//             Hi,
-//           </ThemedText>
-//           <View style={{ flexDirection: "row", gap: 8, marginTop: 5 }}>
-//             <ThemedText type="title">Priyanshu</ThemedText>
-//             <HelloWave />
-//           </View>
-//         </View>
-//
-//         <View
-//           style={{
-//             flexDirection: "row",
-//             gap: 8,
-//             alignItems: "center",
-//             justifyContent: "center",
-//             marginTop: 8,
-//           }}
-//         >
-//           {dates.map((date) => (
-//             <DayCard key={date} date={date} />
-//           ))}
-//         </View>
-//         <View
-//           style={{
-//             marginTop: 16,
-//             borderRadius: 24,
-//             backgroundColor: "#111",
-//             padding: 20,
-//             gap: 10,
-//           }}
-//         >
-//           <Text style={{ color: "#fff", fontSize: 18, textAlign: "center" }}>
-//             🔥 5-Day Streak
-//           </Text>
-//         </View>
-//
-//         <Link
-//           href={"/workout-form/2023-05-25"}
-//           style={{
-//             marginTop: 16,
-//             flexDirection: "row",
-//             alignItems: "center",
-//             backgroundColor: tint,
-//             paddingVertical: 20,
-//             paddingHorizontal: 24,
-//             borderRadius: 24, // pill shape
-//             gap: 4, // space between icon and text
-//             elevation: 2,
-//           }}
-//         >
-//           <View
-//             style={{
-//               flexDirection: "row",
-//               gap: 8,
-//               alignItems: "center",
-//               justifyContent: "center",
-//               width: "100%",
-//             }}
-//           >
-//             <MaterialIcons name="add" size={20} color="black" />
-//             <Text style={{ fontSize: 20 }}>Begin Your Workout</Text>
-//           </View>
-//         </Link>
-//
-//         <View style={{ marginTop: 20, marginBottom: 100 }}>
-//           <View
-//             style={{
-//               flexDirection: "row",
-//               alignItems: "center",
-//               marginTop: 16,
-//               gap: 8,
-//             }}
-//           >
-//             <IconSymbol name="dumbbell" size={24} color="#fff" />
-//             <Text style={{ color: "#fff", fontSize: 28 }}>
-//               Previous Workouts
-//             </Text>
-//           </View>
-//
-//           <ThemedText>Shows the last 5 workouts you did.</ThemedText>
-//
-//           <View style={{ gap: 16, marginTop: 16 }}>
-//             <ExerciseCard />
-//             <ExerciseCard />
-//             <ExerciseCard />
-//             <ExerciseCard />
-//             <ExerciseCard />
-//           </View>
-//           {/* </ScrollView> */}
-//         </View>
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// }
-//
-// const DayCard = ({ date }: { date: string }) => {
-//   const color = useColorScheme() ?? "dark";
-//
-//   const { day, monthdate, bgColor, textColor } = useMemo(() => {
-//     const dateObj = new Date(date);
-//     dateObj.setHours(0, 0, 0, 0);
-//
-//     const today = new Date();
-//     dateObj.setHours(0, 0, 0, 0);
-//
-//     const bgColor =
-//       dateObj.getTime() > today.getTime()
-//         ? Colors[color].cardBackground
-//         : Colors[color].tint;
-//
-//     const textColor = bgColor === Colors[color].tint ? "#000" : "#fff";
-//
-//     return {
-//       day: dateObj.getDay(),
-//       monthdate: dateObj.getDate().toString().padStart(2, "0"),
-//       bgColor,
-//       textColor,
-//     };
-//   }, [date]);
-//
-//   return (
-//     <TouchableOpacity
-//       style={{
-//         backgroundColor: bgColor,
-//         height: 80,
-//         width: 80,
-//         flexDirection: "column",
-//         justifyContent: "center",
-//         alignItems: "center",
-//         borderRadius: 12,
-//         gap: 6,
-//       }}
-//     >
-//       <ThemedText darkColor={textColor} style={{ fontWeight: "bold" }}>
-//         {WeekDays[day]}
-//       </ThemedText>
-//       <ThemedText darkColor={textColor} type="title">
-//         {monthdate}
-//       </ThemedText>
-//     </TouchableOpacity>
-//   );
-// };
-//
-// const StartButton = () => {
-//   return (
-//     <TouchableOpacity style={styles.button}>
-//       <MaterialIcons name="play-arrow" size={20} color="black" />
-//       <Text style={styles.text}>Start</Text>
-//     </TouchableOpacity>
-//   );
-// };
-//
-// const styles = StyleSheet.create({
-//   button: {},
-//   text: {
-//     color: "#000",
-//     fontSize: 14,
-//     fontWeight: "600",
-//   },
-// });
-//
-// export default StartButton;
 
 //{/* button  */}
 //<TouchableOpacity
@@ -555,103 +411,3 @@ const styles = StyleSheet.create({
 //  <MaterialIcons name="copy-all" size={20} color="black" />
 //  <Text style={styles.text}>Apply today</Text>
 //</TouchableOpacity>
-
-{
-  /* <View style={{ marginTop: 20, backgroundColor: "#000" }}> */
-}
-{
-  /*   <View */
-}
-{
-  /*     style={{ */
-}
-{
-  /*       flexDirection: "row", */
-}
-{
-  /*       alignItems: "center", */
-}
-{
-  /*       marginTop: 16, */
-}
-{
-  /*       gap: 8, */
-}
-{
-  /*     }} */
-}
-{
-  /*   > */
-}
-{
-  /*     <IconSymbol name="calendar" size={24} color="#fff" /> */
-}
-{
-  /*     <Text style={{ color: "#fff", fontSize: 28 }}>This Week</Text> */
-}
-{
-  /*   </View> */
-}
-{
-  /**/
-}
-{
-  /*   <View */
-}
-{
-  /*     style={{ */
-}
-{
-  /*       marginTop: 16, */
-}
-{
-  /*       borderWidth: 1, */
-}
-{
-  /*       borderRadius: 24, */
-}
-{
-  /*       borderColor: "rgba(255, 255, 255, 0.2)", */
-}
-{
-  /*       padding: 26, */
-}
-{
-  /*       flexDirection: "row", */
-}
-{
-  /*       gap: 10, */
-}
-{
-  /*       // backgroundColor: "#DDDDDD88", */
-}
-{
-  /*       // backgroundColor: "#FFFF0088", */
-}
-{
-  /*       // backgroundColor: "#00FF0088", */
-}
-{
-  /*       alignItems: "center", */
-}
-{
-  /*     }} */
-}
-{
-  /*   > */
-}
-{
-  /*     <Text style={{ color: "#fff", fontSize: 20 }}> */
-}
-{
-  /*       You hit the gym 5 times this week 💪 */
-}
-{
-  /*     </Text> */
-}
-{
-  /*   </View> */
-}
-{
-  /* </View> */
-}
