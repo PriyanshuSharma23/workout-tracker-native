@@ -19,7 +19,7 @@ export function HelloWave() {
         withTiming(25, { duration: 150 }),
         withTiming(0, { duration: 150 }),
       ),
-      10, // Run the animation 4 times
+      5, // Run the animation 4 times
     );
   }, [rotationAnimation]);
 

@@ -37,7 +37,7 @@ export default function TabLayout() {
           shadowOpacity: 0,
           borderWidth: 0,
           position: "absolute",
-          bottom: 20,
+          bottom: 30,
           width: width / 2,
           maxWidth: 400,
           // backgroundColor: "white",
