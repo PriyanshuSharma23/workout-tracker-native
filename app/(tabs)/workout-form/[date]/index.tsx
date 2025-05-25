@@ -15,6 +15,8 @@ import { useLocalSearchParams } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Months, WeekDays } from "@/constants/WeekDays";
+import { useRouter } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type DateString = string;
 
@@ -40,6 +42,8 @@ type Workout = {
 const WorkoutForm = () => {
   const colorScheme = useColorScheme() ?? "dark";
   const theme = Colors[colorScheme];
+
+  const router = useRouter();
 
   const { date } = useLocalSearchParams();
   const [name, setName] = useState("");
@@ -131,34 +135,44 @@ const WorkoutForm = () => {
     setExercises(newExercises);
   };
 
-  const renderActionButton = (
-    text: string,
+  const renderIconButton = (
+    icon: string,
     onPress: () => void,
     style?: any,
+    textStyle?: any,
   ) => (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.actionButton, { borderColor: theme.border }, style]}
+      style={[styles.iconButton, { borderColor: theme.border }, style]}
     >
-      <Text style={[styles.actionButtonText, { color: theme.text }]}>
-        {text}
+      <Text style={[styles.iconButtonText, { color: theme.text }, textStyle]}>
+        {icon}
       </Text>
     </TouchableOpacity>
   );
 
-  const renderDeleteButton = (onPress: () => void) => (
+  const renderDeleteButton = (onPress: () => void, small = false) => (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.deleteButton, { backgroundColor: "#FF4444" }]}
+      style={[
+        small ? styles.smallDeleteButton : styles.deleteButton,
+        { backgroundColor: "#FF4444" },
+      ]}
     >
-      <Text style={[styles.deleteButtonText, { color: "#FFFFFF" }]}>×</Text>
+      <Text
+        style={[
+          small ? styles.smallDeleteButtonText : styles.deleteButtonText,
+          { color: "#FFFFFF" },
+        ]}
+      >
+        ×
+      </Text>
     </TouchableOpacity>
   );
 
   const expandedDate = () => {
     const d = new Date(date as string);
     d.setHours(0, 0, 0, 0);
-    // return 25 May 2025
     return `${d.getDate()} ${Months[d.getMonth()]} ${d.getFullYear()}`;
   };
 
@@ -170,6 +184,12 @@ const WorkoutForm = () => {
       >
         {/* Header */}
         <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <MaterialIcons name="arrow-back" size={24} color={theme.text} />
+          </TouchableOpacity>
           <Text style={[styles.headerDate, { color: theme.text }]}>
             Workout
           </Text>
@@ -256,139 +276,160 @@ const WorkoutForm = () => {
               { backgroundColor: theme.cardBackground },
             ]}
           >
-            {/* Exercise Header */}
+            {/* Exercise Header - More Compact */}
             <View style={styles.exerciseHeader}>
-              <View style={styles.exerciseInputContainer}>
-                <TextInput
-                  style={[
-                    styles.exerciseNameInput,
-                    {
-                      borderColor: theme.border,
-                      color: theme.text,
-                      backgroundColor: theme.background,
-                    },
-                  ]}
-                  value={exercise.name}
-                  onChangeText={(val) => updateExercise(exIdx, "name", val)}
-                  placeholder="Exercise Name"
-                  placeholderTextColor={theme.icon}
-                />
-              </View>
+              <TextInput
+                style={[
+                  styles.exerciseNameInput,
+                  {
+                    borderColor: theme.border,
+                    color: theme.text,
+                    backgroundColor: theme.background,
+                  },
+                ]}
+                value={exercise.name}
+                onChangeText={(val) => updateExercise(exIdx, "name", val)}
+                placeholder="Exercise Name"
+                placeholderTextColor={theme.icon}
+              />
               {renderDeleteButton(() => deleteExercise(exIdx))}
             </View>
 
-            {/* Sets */}
+            {/* Compact Sets */}
             {exercise.sets.map((dropSet, dropIdx) => (
-              <View key={dropIdx} style={styles.setContainer}>
-                <View style={styles.setHeader}>
-                  <Text style={[styles.setLabel, { color: theme.text }]}>
+              <View key={dropIdx} style={styles.compactSetContainer}>
+                {/* Set Header with Icons */}
+                <View style={styles.compactSetHeader}>
+                  <Text style={[styles.compactSetLabel, { color: theme.text }]}>
                     Set {dropIdx + 1}
                     {dropSet.length > 1 && (
-                      <Text style={{ color: theme.icon }}> (Drop Set)</Text>
+                      <Text style={{ color: theme.icon, fontSize: 12 }}>
+                        {" "}
+                        ⬇
+                      </Text>
                     )}
                   </Text>
-                  <View style={styles.setActions}>
-                    {renderActionButton("Duplicate", () =>
+                  <View style={styles.compactSetActions}>
+                    {renderIconButton("+ Drop set", () =>
+                      addDropSet(exIdx, dropIdx),
+                    )}
+                    {renderIconButton("📋 Copy set", () =>
                       duplicateSet(exIdx, dropIdx),
                     )}
                     {exercise.sets.length > 1 &&
-                      renderDeleteButton(() => deleteSet(exIdx, dropIdx))}
+                      renderDeleteButton(() => deleteSet(exIdx, dropIdx), true)}
                   </View>
                 </View>
 
+                {/* Drop Set Rows */}
                 {dropSet.map((set, setIdx) => (
-                  <View key={setIdx} style={styles.dropSetRow}>
-                    <View style={styles.setInputs}>
-                      <View style={styles.inputWithLabel}>
-                        <Text
-                          style={[styles.inputLabel, { color: theme.icon }]}
-                        >
-                          Reps
-                        </Text>
-                        <TextInput
-                          style={[
-                            styles.setInput,
-                            {
-                              borderColor: theme.border,
-                              color: theme.text,
-                              backgroundColor: theme.background,
-                            },
-                          ]}
-                          keyboardType="numeric"
-                          placeholder="0"
-                          placeholderTextColor={theme.icon}
-                          value={set.reps === 0 ? "" : String(set.reps)}
-                          onChangeText={(val) =>
-                            updateSet(exIdx, dropIdx, setIdx, "reps", val)
-                          }
-                        />
-                      </View>
-                      <View style={styles.inputWithLabel}>
-                        <Text
-                          style={[styles.inputLabel, { color: theme.icon }]}
-                        >
-                          Weight
-                        </Text>
-                        <TextInput
-                          style={[
-                            styles.setInput,
-                            {
-                              borderColor: theme.border,
-                              color: theme.text,
-                              backgroundColor: theme.background,
-                            },
-                          ]}
-                          keyboardType="numeric"
-                          placeholder="0"
-                          placeholderTextColor={theme.icon}
-                          value={set.weight === 0 ? "" : String(set.weight)}
-                          onChangeText={(val) =>
-                            updateSet(exIdx, dropIdx, setIdx, "weight", val)
-                          }
-                        />
-                      </View>
+                  <View key={setIdx} style={styles.compactDropSetRow}>
+                    <View style={styles.compactSetInput}>
+                      <Text
+                        style={[
+                          styles.compactInputLabel,
+                          { color: theme.icon },
+                        ]}
+                      >
+                        🔢
+                      </Text>
+                      <TextInput
+                        style={[
+                          styles.compactInput,
+                          {
+                            borderColor: theme.border,
+                            color: theme.text,
+                            backgroundColor: theme.background,
+                          },
+                        ]}
+                        keyboardType="numeric"
+                        placeholder="Add reps"
+                        placeholderTextColor={theme.icon}
+                        value={set.reps === 0 ? "" : String(set.reps)}
+                        onChangeText={(val) =>
+                          updateSet(exIdx, dropIdx, setIdx, "reps", val)
+                        }
+                      />
                     </View>
+
+                    <Text style={[styles.separator, { color: theme.icon }]}>
+                      ×
+                    </Text>
+
+                    <View style={styles.compactSetInput}>
+                      <Text
+                        style={[
+                          styles.compactInputLabel,
+                          { color: theme.icon },
+                        ]}
+                      >
+                        🏋️
+                      </Text>
+                      <TextInput
+                        style={[
+                          styles.compactInput,
+                          {
+                            borderColor: theme.border,
+                            color: theme.text,
+                            backgroundColor: theme.background,
+                          },
+                        ]}
+                        keyboardType="numeric"
+                        placeholder="Add weight"
+                        placeholderTextColor={theme.icon}
+                        value={set.weight === 0 ? "" : String(set.weight)}
+                        onChangeText={(val) =>
+                          updateSet(exIdx, dropIdx, setIdx, "weight", val)
+                        }
+                      />
+                    </View>
+
                     {dropSet.length > 1 && (
                       <TouchableOpacity
                         onPress={() => deleteDropSet(exIdx, dropIdx, setIdx)}
-                        style={styles.smallDeleteButton}
+                        style={styles.miniDeleteButton}
                       >
-                        <Text style={styles.smallDeleteButtonText}>×</Text>
+                        <Text style={styles.miniDeleteButtonText}>×</Text>
                       </TouchableOpacity>
                     )}
                   </View>
                 ))}
 
-                {/* Add Drop Set Button */}
-                <TouchableOpacity
-                  onPress={() => addDropSet(exIdx, dropIdx)}
-                  style={[
-                    styles.addDropSetButton,
-                    { borderColor: theme.border },
-                  ]}
-                >
-                  <Text style={[styles.addDropSetText, { color: theme.icon }]}>
-                    + Add Drop Set
-                  </Text>
-                </TouchableOpacity>
+                {/* Compact Add Drop Set */}
+                {/* <TouchableOpacity */}
+                {/*   onPress={() => addDropSet(exIdx, dropIdx)} */}
+                {/*   style={[ */}
+                {/*     styles.compactAddDropSetButton, */}
+                {/*     { borderColor: theme.border }, */}
+                {/*   ]} */}
+                {/* > */}
+                {/*   <Text */}
+                {/*     style={[ */}
+                {/*       styles.compactAddDropSetText, */}
+                {/*       { color: theme.icon }, */}
+                {/*     ]} */}
+                {/*   > */}
+                {/*     + Drop */}
+                {/*   </Text> */}
+                {/* </TouchableOpacity> */}
               </View>
             ))}
 
-            {/* Add Set Button */}
+            {/* Compact Add Set Button */}
             <TouchableOpacity
               onPress={() => addSet(exIdx)}
               style={[
-                styles.addSetButton,
+                styles.compactAddSetButton,
                 { backgroundColor: theme.highlight },
               ]}
             >
               <Text
                 style={[
-                  styles.addSetButtonText,
+                  styles.compactAddSetButtonText,
                   { color: colorScheme === "dark" ? "#000" : "#000" },
                 ]}
               >
-                + Add Set
+                + Set
               </Text>
             </TouchableOpacity>
           </View>
@@ -440,6 +481,15 @@ const styles = StyleSheet.create({
   headerDate: {
     fontSize: 16,
   },
+  backButton: {
+    position: "absolute",
+    left: 16,
+    top: 16,
+  },
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
   section: {
     borderRadius: 16,
     padding: 20,
@@ -486,8 +536,8 @@ const styles = StyleSheet.create({
   },
   exerciseCard: {
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    padding: 16,
+    marginBottom: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -497,121 +547,134 @@ const styles = StyleSheet.create({
   exerciseHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
-  },
-  exerciseInputContainer: {
-    flex: 1,
-    marginRight: 12,
+    marginBottom: 12,
   },
   exerciseNameInput: {
+    flex: 1,
     borderWidth: 1.5,
     borderRadius: 12,
-    padding: 16,
-    fontSize: 18,
+    padding: 12,
+    fontSize: 16,
     fontWeight: "600",
+    marginRight: 8,
   },
   deleteButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
   },
   deleteButtonText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
   },
-  setContainer: {
-    marginBottom: 16,
-    paddingBottom: 16,
+  // New compact styles
+  compactSetContainer: {
+    marginBottom: 10,
+    paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(128, 128, 128, 0.2)",
+    borderBottomColor: "rgba(128, 128, 128, 0.1)",
   },
-  setHeader: {
+  compactSetHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
-  },
-  setLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  setActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  actionButton: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  actionButtonText: {
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  dropSetRow: {
-    flexDirection: "row",
-    alignItems: "center",
     marginBottom: 8,
   },
-  setInputs: {
+  compactSetLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  compactSetActions: {
     flexDirection: "row",
-    flex: 1,
-    gap: 12,
+    alignItems: "center",
+    gap: 6,
   },
-  inputWithLabel: {
-    flex: 1,
+  iconButton: {
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
-  inputLabel: {
+  iconButtonText: {
     fontSize: 12,
     fontWeight: "500",
-    marginBottom: 4,
   },
-  setInput: {
+  compactDropSetRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+    gap: 8,
+  },
+  compactSetInput: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  compactInputLabel: {
+    fontSize: 14,
+    width: 20,
+  },
+  compactInput: {
+    flex: 1,
     borderWidth: 1,
     borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
+    padding: 10,
+    fontSize: 14,
     textAlign: "center",
   },
+  separator: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
   smallDeleteButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#FF4444",
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 8,
   },
   smallDeleteButtonText: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
   },
-  addDropSetButton: {
+  miniDeleteButton: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: "#FF4444",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  miniDeleteButtonText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  compactAddDropSetButton: {
     borderWidth: 1,
     borderStyle: "dashed",
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: 6,
+    padding: 6,
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 4,
   },
-  addDropSetText: {
-    fontSize: 14,
+  compactAddDropSetText: {
+    fontSize: 12,
     fontWeight: "500",
   },
-  addSetButton: {
-    padding: 14,
+  compactAddSetButton: {
+    padding: 10,
     alignItems: "center",
-    borderRadius: 12,
-    marginTop: 8,
+    borderRadius: 8,
+    marginTop: 4,
   },
-  addSetButtonText: {
+  compactAddSetButtonText: {
     fontWeight: "600",
-    fontSize: 16,
+    fontSize: 14,
   },
   emptyState: {
     alignItems: "center",
