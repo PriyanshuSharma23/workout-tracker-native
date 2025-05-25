@@ -27,5 +27,6 @@ export const Colors = {
     tabIconDefault: "#9BA1A6",
     tabIconSelected: tintColorDark,
     highlight: "#C6FF00",
+    border: "#DDE1E4",
   },
 };

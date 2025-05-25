@@ -59,12 +59,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="workouts"
         options={{
           title: "Workouts",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="list.triangle" color={color} />
+            <IconSymbol size={28} name="rectangle.stack.fill" color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="workout-form/[date]/index"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
