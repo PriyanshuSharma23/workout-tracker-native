@@ -18,10 +18,14 @@ import { Months, WeekDays } from "@/constants/WeekDays";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Exercise } from "@/types/workout";
+import { ThemedText } from "@/components/ThemedText";
 
 const WorkoutForm = () => {
   const colorScheme = useColorScheme() ?? "dark";
   const theme = Colors[colorScheme];
+
+  const oppositeColorScheme = colorScheme === "dark" ? "light" : "dark";
+  const oppositeTheme = Colors[oppositeColorScheme];
 
   const router = useRouter();
 
@@ -154,6 +158,16 @@ const WorkoutForm = () => {
     return `${d.getDate()} ${Months[d.getMonth()]} ${d.getFullYear()}`;
   };
 
+  const isDateBeforeToday = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const dateObj = new Date(date as string);
+    dateObj.setHours(0, 0, 0, 0);
+
+    return today.getTime() > dateObj.getTime();
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
       <ScrollView
@@ -174,6 +188,36 @@ const WorkoutForm = () => {
           <Text style={[styles.headerTitle, { color: theme.icon }]}>
             {expandedDate()}
           </Text>
+
+          {isDateBeforeToday() && (
+            <TouchableOpacity
+              style={{
+                marginTop: 20,
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: theme.tint,
+                paddingVertical: 6,
+                paddingHorizontal: 16,
+                borderRadius: 12, // pill shape
+                gap: 4, // space between icon and text
+              }}
+            >
+              <MaterialIcons
+                name="copy-all"
+                size={20}
+                color={oppositeTheme.text}
+              />
+              <ThemedText
+                lightColor={theme.text}
+                darkColor={oppositeTheme.text}
+                style={{
+                  fontSize: 14,
+                }}
+              >
+                Copy to today
+              </ThemedText>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Workout Info Section */}

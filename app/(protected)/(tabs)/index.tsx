@@ -1,18 +1,4 @@
 //{/* button  */}
-//<TouchableOpacity
-//  style={{
-//    flexDirection: "row",
-//    alignItems: "center",
-//    backgroundColor: tint,
-//    paddingVertical: 6,
-//    paddingHorizontal: 16,
-//    borderRadius: 12, // pill shape
-//    gap: 4, // space between icon and text
-//  }}
-//>
-//  <MaterialIcons name="copy-all" size={20} color="black" />
-//  <Text style={styles.text}>Apply today</Text>
-//</TouchableOpacity>
 import {
   StyleSheet,
   useColorScheme,
