@@ -113,6 +113,8 @@ export default function WorkoutHistory() {
         {renderWorkoutSection("This Week", groupedWorkouts.thisWeek)}
         {renderWorkoutSection("This Month", groupedWorkouts.thisMonth)}
         {renderWorkoutSection("Older", groupedWorkouts.older)}
+
+        <ThemedView style={{ marginBottom: 80, gap: 16 }} />
       </ScrollView>
     </SafeAreaView>
     // </ParallaxScrollView>
