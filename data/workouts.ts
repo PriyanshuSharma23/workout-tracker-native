@@ -9,11 +9,9 @@ export const workouts: Workout[] = [
       {
         name: "Barbell Bench Press",
         sets: [
-          [
-            { reps: 8, weight: 60 },
-            { reps: 6, weight: 55 },
-            { reps: 6, weight: 50 },
-          ],
+          [{ reps: 8, weight: 60 }],
+          [{ reps: 6, weight: 55 }],
+          [{ reps: 6, weight: 50 }],
         ],
       },
       {
@@ -23,16 +21,13 @@ export const workouts: Workout[] = [
             { reps: 10, weight: 30 },
             { reps: 8, weight: 25 },
           ],
+          [{ reps: 10, weight: 30 }],
+          [{ reps: 10, weight: 30 }],
         ],
       },
       {
         name: "Tricep Pushdown",
-        sets: [
-          [
-            { reps: 12, weight: 20 },
-            { reps: 10, weight: 15 },
-          ],
-        ],
+        sets: [[{ reps: 12, weight: 20 }], [{ reps: 10, weight: 15 }]],
       },
     ],
   },
@@ -43,30 +38,15 @@ export const workouts: Workout[] = [
     exercises: [
       {
         name: "Barbell Row",
-        sets: [
-          [
-            { reps: 10, weight: 50 },
-            { reps: 8, weight: 45 },
-          ],
-        ],
+        sets: [[{ reps: 10, weight: 50 }], [{ reps: 8, weight: 45 }]],
       },
       {
         name: "Lat Pulldown",
-        sets: [
-          [
-            { reps: 12, weight: 40 },
-            { reps: 10, weight: 35 },
-          ],
-        ],
+        sets: [[{ reps: 12, weight: 40 }], [{ reps: 10, weight: 35 }]],
       },
       {
         name: "Barbell Curl",
-        sets: [
-          [
-            { reps: 10, weight: 20 },
-            { reps: 8, weight: 15 },
-          ],
-        ],
+        sets: [[{ reps: 10, weight: 20 }], [{ reps: 8, weight: 15 }]],
       },
     ],
   },
@@ -78,30 +58,18 @@ export const workouts: Workout[] = [
       {
         name: "Back Squat",
         sets: [
-          [
-            { reps: 8, weight: 80 },
-            { reps: 6, weight: 75 },
-            { reps: 6, weight: 70 },
-          ],
+          [{ reps: 8, weight: 80 }],
+          [{ reps: 6, weight: 75 }],
+          [{ reps: 6, weight: 70 }],
         ],
       },
       {
         name: "Leg Press",
-        sets: [
-          [
-            { reps: 12, weight: 100 },
-            { reps: 10, weight: 90 },
-          ],
-        ],
+        sets: [[{ reps: 12, weight: 100 }], [{ reps: 10, weight: 90 }]],
       },
       {
         name: "Calf Raise",
-        sets: [
-          [
-            { reps: 15, weight: 40 },
-            { reps: 12, weight: 35 },
-          ],
-        ],
+        sets: [[{ reps: 15, weight: 40 }], [{ reps: 12, weight: 35 }]],
       },
     ],
   },

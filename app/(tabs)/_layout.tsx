@@ -8,6 +8,7 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -63,14 +64,8 @@ export default function TabLayout() {
         options={{
           title: "Workouts",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="rectangle.stack.fill" color={color} />
+            <MaterialIcons size={28} name="history" color={color} />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="workout-form/[date]/index"
-        options={{
-          href: null,
         }}
       />
     </Tabs>

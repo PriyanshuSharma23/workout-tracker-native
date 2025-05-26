@@ -31,7 +31,7 @@ import { useMemo, useState, useEffect } from "react";
 import { Colors } from "@/constants/Colors";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { ExerciseCard } from "@/components/ExerciseCard";
 import { WeekDays } from "@/constants/WeekDays";
 import { workouts } from "@/data/workouts";
@@ -154,12 +154,6 @@ export default function HomeScreen() {
           )}
 
           <View style={styles.exerciseCardsContainer}>
-            {/* <ExerciseCard /> */}
-            {/* <ExerciseCard /> */}
-            {/* <ExerciseCard /> */}
-            {/* <ExerciseCard /> */}
-            {/* <ExerciseCard /> */}
-
             {workouts.length === 0 && (
               <View style={styles.emptyState}>
                 <Text style={[styles.emptyStateText, { color: theme.icon }]}>
@@ -174,6 +168,38 @@ export default function HomeScreen() {
             {workouts.map((workout) => (
               <ExerciseCard key={workout.date} workout={workout} />
             ))}
+
+            {workouts.length > 0 && (
+              <Link
+                href={"/workouts"}
+                style={{
+                  width: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 16,
+                  paddingVertical: 12,
+                  borderRadius: 12,
+                  backgroundColor: theme.cardBackground,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 4,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
+                >
+                  <ThemedText>View All Workouts</ThemedText>
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={20}
+                    color={theme.text}
+                  />
+                </View>
+              </Link>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -184,6 +210,8 @@ export default function HomeScreen() {
 const DayCard = ({ date, isSelected = false }: DayCardProps) => {
   const colorScheme = useColorScheme() ?? "dark";
   const oppositeColorScheme = colorScheme === "dark" ? "light" : "dark";
+
+  const router = useRouter();
 
   const theme = Colors[colorScheme];
   const oppositeTheme = Colors[oppositeColorScheme];
@@ -256,6 +284,7 @@ const DayCard = ({ date, isSelected = false }: DayCardProps) => {
 
   return (
     <TouchableOpacity
+      onPress={() => router.push(`/workout-form/${date}`)}
       style={[styles.dayCard, { backgroundColor: bgColor }, glowStyle]}
       accessibilityRole="button"
       accessibilityLabel={`${isToday ? "Today, " : ""}${dayName} ${monthdate}`}
